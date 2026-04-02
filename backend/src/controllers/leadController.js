@@ -1,4 +1,5 @@
 const Lead = require("../models/Lead");
+const logActivity = require("../utils/logActivity");
 
 const createLead = async (req, res) => {
   try {
@@ -39,6 +40,13 @@ const createLead = async (req, res) => {
     res.status(201).json({
       message: "Lead created successfully",
       lead,
+    });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Created",
+      module: "Lead",
+      details: `Lead created: ${lead.title}`,
     });
   } catch (error) {
     res.status(500).json({
@@ -142,6 +150,13 @@ const updateLead = async (req, res) => {
       message: "Lead updated successfully",
       lead: updatedLead,
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Updated",
+      module: "Lead",
+      details: `Lead updated: ${updatedLead.title}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error updating lead",
@@ -173,6 +188,13 @@ const deleteLead = async (req, res) => {
 
     res.status(200).json({
       message: "Lead deleted successfully",
+    });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Deleted",
+      module: "Lead",
+      details: `Lead deleted: ${lead.title}`,
     });
   } catch (error) {
     res.status(500).json({

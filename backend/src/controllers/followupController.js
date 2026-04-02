@@ -146,6 +146,13 @@ const updateFollowup = async (req, res) => {
       message: "Followup updated successfully",
       followup: updatedFollowup,
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Updated",
+      module: "Followup",
+      details: `Followup updated: ${updatedFollowup.title}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error updating followup",
@@ -177,6 +184,13 @@ const deleteFollowup = async (req, res) => {
 
     res.status(200).json({
       message: "Followup deleted successfully",
+    });
+    
+    await logActivity({
+      user: req.session.user,
+      action: "Deleted",
+      module: "Followup",
+      details: `Followup deleted: ${followup.title}`,
     });
   } catch (error) {
     res.status(500).json({
@@ -236,6 +250,13 @@ const convertLeadToFollowup = async (req, res) => {
     res.status(201).json({
       message: "Lead converted to followup successfully",
       followup,
+    });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Converted",
+      module: "Followup",
+      details: `Lead converted to followup: ${lead.title}`,
     });
   } catch (error) {
     res.status(500).json({

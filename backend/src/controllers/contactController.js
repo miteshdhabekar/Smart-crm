@@ -36,6 +36,13 @@ const createContact = async (req, res) => {
       message: "Contact created successfully",
       contact,
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Created",
+      module: "Contact",
+      details: `Contact created: ${contact.fullName}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error creating contact",
@@ -120,6 +127,13 @@ const updateContact = async (req, res) => {
       message: "Contact updated successfully",
       contact: updatedContact,
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Updated",
+      module: "Contact",
+      details: `Contact updated: ${updatedContact.fullName}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error updating contact",
@@ -151,6 +165,13 @@ const deleteContact = async (req, res) => {
 
     res.status(200).json({
       message: "Contact deleted successfully",
+    });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Deleted",
+      module: "Contact",
+      details: `Contact deleted: ${contact.fullName}`,
     });
   } catch (error) {
     res.status(500).json({

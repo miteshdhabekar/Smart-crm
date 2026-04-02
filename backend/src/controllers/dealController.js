@@ -61,6 +61,12 @@ const createDeal = async (req, res) => {
       await Lead.findByIdAndUpdate(leadId, { status: "converted" });
     }
 
+    return res.status(201).json({
+      message: "Deal created successfully",
+      deal,
+    });
+
+    
     await logActivity({
       user: req.session.user,
       action: "Created",
@@ -68,12 +74,6 @@ const createDeal = async (req, res) => {
       details: `Deal created: ${deal.title}`,
     });
 
-    return res.status(201).json({
-      message: "Deal created successfully",
-      deal,
-    });
-
-    
   } catch (error) {
     console.log("CREATE DEAL ERROR:", error);
 
@@ -195,6 +195,14 @@ const updateDeal = async (req, res) => {
       deal: updatedDeal,
     });
 
+    
+    await logActivity({
+      user: req.session.user,
+      action: "Updated",
+      module: "Deal",
+      details: `Deal updated: ${updatedDeal.title}`,
+    });
+
   } catch (error) {
     console.error("UPDATE DEAL ERROR:", error);
     res.status(500).json({
@@ -231,6 +239,14 @@ const deleteDeal = async (req, res) => {
 
     res.status(200).json({
       message: "Deal deleted successfully",
+    });
+
+    
+    await logActivity({
+      user: req.session.user,
+      action: "Deleted",
+      module: "Deal",
+      details: `Deal deleted: ${deal.title}`,
     });
   } catch (error) {
     res.status(500).json({
@@ -287,6 +303,14 @@ const convertLeadToDeal = async (req, res) => {
     res.status(201).json({
       message: "Lead converted to deal successfully",
       deal,
+    });
+
+    
+    await logActivity({
+      user: req.session.user,
+      action: "Converted",
+      module: "Deal",
+      details: `Lead converted to deal: ${lead.title}`,
     });
   } catch (error) {
     res.status(500).json({

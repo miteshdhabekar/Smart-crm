@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const logActivity = require("../utils/logActivity");
 
 const registerUser = async (req, res) => {
   try {
@@ -40,6 +41,13 @@ const registerUser = async (req, res) => {
         
       },
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Approved",
+      module: "Request",
+      details: `Approved account request for ${user.email}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error in registration",
@@ -75,6 +83,13 @@ const loginUser = async (req, res) => {
   if (user.approvalStatus === "denied") {
     return res.status(403).json({
       message: "Your account request was denied by admin",
+    });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Denied",
+      module: "Request",
+      details: `Denied account request for ${user.email}`,
     });
   }
 }

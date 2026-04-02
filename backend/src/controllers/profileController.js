@@ -112,6 +112,13 @@ const updatePassword = async (req, res) => {
     res.status(200).json({
       message: "Password updated successfully",
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Updated",
+      module: "Profile",
+      details: "Password updated",
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error updating password",
@@ -138,6 +145,13 @@ const deleteAccount = async (req, res) => {
       return res.status(200).json({
         message: "Account deleted successfully",
       });
+    });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Deleted",
+      module: "Profile",
+      details: "Account deleted",
     });
   } catch (error) {
     res.status(500).json({

@@ -23,6 +23,13 @@ const createEmailTemplate = async (req, res) => {
       message: "Email template created successfully",
       template,
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Created",
+      module: "Email Template",
+      details: `Template created: ${template.title}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error creating email template",
@@ -107,6 +114,13 @@ const updateEmailTemplate = async (req, res) => {
       message: "Email template updated successfully",
       template: updatedTemplate,
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Updated",
+      module: "Email Template",
+      details: `Template updated: ${updatedTemplate.title}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error updating email template",
@@ -138,6 +152,13 @@ const deleteEmailTemplate = async (req, res) => {
 
     res.status(200).json({
       message: "Email template deleted successfully",
+    });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Deleted",
+      module: "Email Template",
+      details: `Template deleted: ${template.title}`,
     });
   } catch (error) {
     res.status(500).json({

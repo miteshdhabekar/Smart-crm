@@ -35,16 +35,16 @@ const createCompany = async (req, res) => {
       assignedTo: req.session.user.id,
     });
 
+    res.status(201).json({
+      message: "Company created successfully",
+      company,
+    });
+
     await logActivity({
       user: req.session.user,
       action: "Created",
       module: "Company",
       details: `Company created: ${company.companyName}`,
-    });
-
-    res.status(201).json({
-      message: "Company created successfully",
-      company,
     });
   } catch (error) {
     res.status(500).json({
@@ -130,6 +130,13 @@ const updateCompany = async (req, res) => {
       message: "Company updated successfully",
       company: updatedCompany,
     });
+
+      await logActivity({
+      user: req.session.user,
+      action: "Updated",
+      module: "Company",
+      details: `Company updated: ${updatedCompany.companyName}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error updating company",
@@ -161,6 +168,13 @@ const deleteCompany = async (req, res) => {
 
     res.status(200).json({
       message: "Company deleted successfully",
+    });
+
+      await logActivity({
+      user: req.session.user,
+      action: "Deleted",
+      module: "Company",
+      details: `Company deleted: ${company.companyName}`,
     });
   } catch (error) {
     res.status(500).json({

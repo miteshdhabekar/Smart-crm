@@ -14,7 +14,9 @@ const logActivity = async ({ user, action, module, details = "" }) => {
     });
   } catch (error) {
     console.log("Activity log error:", error.message);
+    
   }
+  console.log("LOG ACTIVITY CALLED:", action, module);
 };
 
 module.exports = logActivity;
