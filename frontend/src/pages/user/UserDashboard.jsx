@@ -23,11 +23,13 @@ import {
 import { motion } from "framer-motion";
 import UserSidebar from "../../components/layout/UserSidebar";
 import { getUserDashboardSummary } from "../../services/dashboardService";
+import { useAuth } from "../../context/AuthContext";
 
 const UserDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { user } = useAuth();
 
   const fetchDashboard = async () => {
     try {
@@ -178,7 +180,7 @@ const UserDashboard = () => {
                 </span>
               </div>
               <h1 className="text-5xl font-bold text-slate-800 tracking-tighter">
-                Good {new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 17 ? "Afternoon" : "Evening"}, Mitesh
+                Good {new Date().getHours() < 12 ? "Morning" : new Date().getHours() < 17 ? "Afternoon" : "Evening"}, {user?.name || "User"}
               </h1>
               <p className="mt-2 text-xl text-slate-600">
                 Your CRM performance at a glance
