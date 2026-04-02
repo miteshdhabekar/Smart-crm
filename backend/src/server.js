@@ -1,6 +1,11 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
+const cors = require('cors');
+app.use(cors({
+  origin: 'https://trinetra-backend-4u6j.onrender.com' // Your actual Vercel URL
+}));
+
 const app = require("./app");
 const connectDB = require("./config/db");
 
