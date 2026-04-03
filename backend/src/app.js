@@ -43,7 +43,7 @@ app.use(
 app.use(express.json());
 app.use(sessionMiddleware);
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("Smart CRM System Backend Running");
 });
 
