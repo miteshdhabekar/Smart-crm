@@ -1,5 +1,4 @@
 const express = require("express");
-app.set("trust proxy", 1);
 const cors = require("cors");
 const sessionMiddleware = require("./config/session");
 const authRoutes = require("./routes/authRoutes");
@@ -20,6 +19,7 @@ const adminActivityRoutes = require("./routes/adminActivityRoutes");
 const testRoutes = require("./routes/testRoutes");
 
 const app = express();
+app.set("trust proxy", 1);
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
