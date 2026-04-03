@@ -20,6 +20,19 @@ const testRoutes = require("./routes/testRoutes");
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://smart-crm-alpha.vercel.app",
+  
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
