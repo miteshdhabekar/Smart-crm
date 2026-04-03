@@ -22,7 +22,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://trinetra-backend-4u6j.onrender.com",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(sessionMiddleware);
 
 app.get("/", (req, res) => {
-  res.send("EnterpriseLead CRM Backend Running");
+  res.send("Smart CRM System Backend Running");
 });
 
 app.get("/session-test", (req, res) => {
