@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 // We import from 'react-icons/fa6' (Font Awesome 6)
-import { FaChartBar, FaGithub, FaTwitter, FaLinkedin, FaEnvelope } from 'react-icons/fa6';
+import { FaChartBar, FaInstagram, FaTwitter, FaLinkedin, FaEnvelope } from 'react-icons/fa6';
 import { HiOutlineBadgeCheck } from 'react-icons/hi'; // From Heroicons
 
 const Footer = () => {
@@ -26,14 +26,14 @@ const Footer = () => {
             
             {/* Social Icons */}
             <div className="flex gap-4">
-              <a href="#" className="p-2.5 bg-slate-800 hover:bg-indigo-600 rounded-full transition-all duration-300">
+              <a href="https://x.com/theenterprisew" className="p-2.5 bg-slate-800 hover:bg-indigo-600 rounded-full transition-all duration-300">
                 <FaTwitter size={16} />
               </a>
-              <a href="#" className="p-2.5 bg-slate-800 hover:bg-indigo-600 rounded-full transition-all duration-300">
+              <a href="https://in.linkedin.com/company/theenterpriseworld" className="p-2.5 bg-slate-800 hover:bg-indigo-600 rounded-full transition-all duration-300">
                 <FaLinkedin size={16} />
               </a>
-              <a href="#" className="p-2.5 bg-slate-800 hover:bg-indigo-600 rounded-full transition-all duration-300">
-                <FaGithub size={16} />
+              <a href="https://www.instagram.com/the_enterprise_world/" className="p-2.5 bg-slate-800 hover:bg-indigo-600 rounded-full transition-all duration-300">
+                <FaInstagram size={16} />
               </a>
             </div>
           </div>

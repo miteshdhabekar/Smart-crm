@@ -11,6 +11,7 @@ import {
   FaBuilding,
   FaChevronLeft,
   FaChevronRight,
+  FaBolt,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 
@@ -62,7 +63,7 @@ const UserSidebar = () => {
         <div className="px-4 pt-7 pb-5 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-400 via-violet-500 to-cyan-400 flex items-center justify-center text-xl font-bold shadow-lg">
-              T
+              <FaBolt/>
             </div>
             {!isCollapsed && (
               <div className="whitespace-nowrap transition-opacity duration-300">

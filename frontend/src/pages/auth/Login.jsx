@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import GoogleSignInButton from "../../components/auth/GoogleSignInButton";
 import { Mail, Lock, CheckCircle2, BarChart3, Loader2 } from 'lucide-react'; // Added Loader icon
 
 const Login = () => {
@@ -46,6 +47,18 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const handleGoogleSuccess = (data) => {
+  if (data.user.role === "admin") {
+    navigate("/admin/dashboard");
+  } else {
+    navigate("/user/dashboard");
+  }
+};
+
+const handleGoogleError = (msg) => {
+  setError(msg);
+};
 
   return (
     <div className="min-h-screen bg-white flex">
@@ -112,7 +125,7 @@ const Login = () => {
             <div>
               <div className="flex justify-between mb-2">
                 <label className="block text-sm font-semibold text-slate-700">Password</label>
-                <button type="button" className="text-sm font-medium text-indigo-600 hover:underline">Forgot?</button>
+                <Link to="/forgot-password" className="text-sm font-medium text-indigo-600 hover:underline">Forgot?</Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -144,6 +157,22 @@ const Login = () => {
                 "Access Dashboard"
               )}
             </button>
+            <div className="relative my-6">
+  <div className="absolute inset-0 flex items-center">
+    <div className="w-full border-t border-slate-200"></div>
+  </div>
+  <div className="relative flex justify-center text-xs uppercase">
+    <span className="bg-slate-50 px-3 text-slate-500">Or</span>
+  </div>
+</div>
+
+<div className="flex justify-center">
+  <GoogleSignInButton
+    onSuccess={handleGoogleSuccess}
+    onError={handleGoogleError}
+    text="signin_with"
+  />
+</div>
           </form>
 
           <footer className="mt-8 text-center">

@@ -24,9 +24,16 @@ import UserProfile from "../pages/user/UserProfile";
 import AdminUsers from "../pages/admin/AdminUsers";
 import AdminRequests from "../pages/admin/AdminRequests";
 import AdminActivity from "../pages/admin/AdminActivity";
+import TermsOfService from "../pages/footerpages/TermsOfService";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
+import AdminRevenueSummary from "../pages/admin/AdminRevenueSummary";
+import AdminProfile from "../pages/admin/AdminProfile";
+import ChatbotWidget from "../components/chatbot/ChatbotWidget";
 
 const AppRoutes = () => {
   return (
+    <>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={< Home />} />
@@ -41,10 +48,13 @@ const AppRoutes = () => {
         <Route path="/status" element={<SystemStatus />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/contact" element={<ContactSales />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/requests" element={<AdminRequests />} />
-        <Route path="/admin/activity" element={<AdminActivity />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+       
+        
+        
 
 
 
@@ -111,6 +121,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/user/followups"
         element={
@@ -119,16 +130,81 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/user/profile"
-        element={<UserProfile />}
+
+       <Route 
+        path="/user/contact" 
+        element={
+        <ProtectedRoute allowedRole="user">
+          <ContactSales />
+        </ProtectedRoute>
+        }
       />
 
+      <Route
+        path="/user/profile"
+        element={
+        <ProtectedRoute allowedRole="user">
+          <UserProfile /> 
+        </ProtectedRoute>
+          }
+      />
+
+      <Route 
+        path="/admin/users" 
+        element={
+        <ProtectedRoute allowedRole="admin">
+          <AdminUsers />
+        </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/revenue-summary"
+        element={
+          <ProtectedRoute allowedRole="admin">
+            <AdminRevenueSummary />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route 
+        path="/admin/requests" 
+        element={
+        <ProtectedRoute allowedRole="admin">
+          <AdminRequests />
+        </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+          path="/admin/activity" 
+          element={
+            <ProtectedRoute allowedRole="admin">
+          <AdminActivity />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/admin/profile" 
+        element={
+        <ProtectedRoute allowedRole="admin">
+        <AdminProfile />
+        </ProtectedRoute>
+      } 
+    />
 
 
       </Routes>
+          <ChatbotWidget />
     </BrowserRouter>
+
+    </>
   );
+};
+
+const ChatbotWrapper = () => {
+  return <ChatbotWidget />;
 };
 
 export default AppRoutes;

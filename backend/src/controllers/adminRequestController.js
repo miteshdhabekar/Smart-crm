@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
+const logActivity = require("../utils/logActivity");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -48,6 +49,13 @@ const approveRequest = async (req, res) => {
     res.status(200).json({
       message: "Request approved successfully",
     });
+
+    await logActivity({
+      user: req.session.user,
+      action: "Approved",
+      module: "Request",
+      details: `Approved account request for ${user.email}`,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error approving request",
@@ -79,6 +87,12 @@ const denyRequest = async (req, res) => {
 
     res.status(200).json({
       message: "Request denied successfully",
+    });
+    await logActivity({
+      user: req.session.user,
+      action: "Denied",
+      module: "Request",
+      details: `Denied account request for ${user.email}`,
     });
   } catch (error) {
     res.status(500).json({

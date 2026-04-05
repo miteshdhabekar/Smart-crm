@@ -8,6 +8,8 @@ import {
   FaSignOutAlt,
   FaChevronLeft,
   FaChevronRight,
+  FaBolt,
+  FaTable
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 
@@ -20,12 +22,14 @@ const AdminSidebar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <FaTachometerAlt /> },
     { name: "Users", path: "/admin/users", icon: <FaUsers /> },
+    { name: "Revenue Report", path: "/admin/revenue-summary", icon: <FaTable />},
     { name: "Requests", path: "/admin/requests", icon: <FaClipboardCheck /> },
     { name: "Activity", path: "/admin/activity", icon: <FaHistory /> },
+    
   ];
 
   return (
-    <div 
+    <div
       className={`min-h-screen bg-slate-900 text-white flex flex-col justify-between transition-all duration-300 ease-in-out relative ${
         isCollapsed ? "w-20" : "w-72"
       }`}
@@ -44,7 +48,7 @@ const AdminSidebar = () => {
         <div className="px-4 pt-7 pb-5 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-400 via-violet-500 to-cyan-400 flex items-center justify-center text-xl font-bold shadow-lg">
-              T
+              <FaBolt />
             </div>
             {!isCollapsed && (
               <div className="whitespace-nowrap transition-opacity duration-300">

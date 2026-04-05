@@ -1,4 +1,5 @@
 const EmailTemplate = require("../models/EmailTemplate");
+const logActivity = require("../utils/logActivity");
 
 const createEmailTemplate = async (req, res) => {
   try {

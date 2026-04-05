@@ -27,6 +27,16 @@ const userSchema = new mongoose.Schema(
   default: "user",
 },
 
+resetPasswordToken: {
+  type: String,
+  default: "",
+},
+
+resetPasswordExpires: {
+  type: Date,
+  default: null,
+},
+
 phone: {
       type: String,
       default: "",
@@ -62,6 +72,7 @@ phone: {
       default: "",
       trim: true,
     },
+    
   },
   {
     timestamps: true,

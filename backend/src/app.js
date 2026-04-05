@@ -17,14 +17,15 @@ const adminUserRoutes = require("./routes/adminUserRoutes");
 const adminRequestRoutes = require("./routes/adminRequestRoutes");
 const adminActivityRoutes = require("./routes/adminActivityRoutes");
 const testRoutes = require("./routes/testRoutes");
+const revenueSummaryRoutes = require("./routes/revenueSummaryRoutes");
 
 const app = express();
 app.set("trust proxy", 1);
 
 const allowedOrigins = [
+  "http://localhost:5173",
   process.env.FRONTEND_URL,
   "https://smart-crm-alpha.vercel.app",
-  
 ];
 
 app.use(
@@ -34,12 +35,6 @@ app.use(
   })
 );
 
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-  })
-);
 
 app.use(express.json());
 app.use(sessionMiddleware);
@@ -76,6 +71,7 @@ app.use("/api/admin-dashboard", adminDashboardRoutes);
 app.use("/api/admin-users", adminUserRoutes);
 app.use("/api/admin-requests", adminRequestRoutes);
 app.use("/api/admin-activity", adminActivityRoutes);
+app.use("/api/revenue-summary", revenueSummaryRoutes);
 app.use("/api/test", testRoutes);
 
 module.exports = app;

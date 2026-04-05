@@ -38,7 +38,7 @@ const UserLeads = () => {
   const [sourceFilter, setSourceFilter] = useState("all");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 30;
 
   const [mailForm, setMailForm] = useState({
     targetStatus: "new",
