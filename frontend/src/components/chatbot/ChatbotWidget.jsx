@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Chatbot } from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
-import { MessageCircle, X } from "lucide-react";
+import { Bot, MessageCircle, X } from "lucide-react";
 
 import config from "../../chatbot/config.jsx";
 import MessageParser from "../../chatbot/MessageParser";
@@ -93,13 +93,13 @@ const ChatbotWidget = () => {
         ) : (
           <>
             <div className="relative">
-                <MessageCircle size={28} />
+                <Bot size={28} />
                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
                 </span>
             </div>
-            <span className="font-bold pr-1 text-sm md:text-base">Ask CRM AI</span>
+            <span className="font-bold pr-1 text-sm md:text-base">AI</span>
           </>
         )}
       </button>
