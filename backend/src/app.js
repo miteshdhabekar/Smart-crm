@@ -23,7 +23,7 @@ const app = express();
 app.set("trust proxy", 1);
 
 const allowedOrigins = [
-  "http://localhost:5173",
+  // "http://localhost:5173",
   process.env.FRONTEND_URL,
   "https://smart-crm-alpha.vercel.app",
 ];
