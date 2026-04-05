@@ -99,7 +99,7 @@ const ChatbotWidget = () => {
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
                 </span>
             </div>
-            <span className="font-bold pr-1 text-sm md:text-base">AI</span>
+            {/* <span className="font-bold pr-1 text-sm md:text-base">AI</span> */}
           </>
         )}
       </button>
