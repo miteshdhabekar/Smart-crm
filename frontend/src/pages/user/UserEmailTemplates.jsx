@@ -27,7 +27,7 @@ const UserEmailTemplates = () => {
   const [formData, setFormData] = useState({
     title: "",
     subject: "",
-    category: "general",
+    category: "proposal",
     body: "",
   });
 
@@ -68,7 +68,7 @@ const UserEmailTemplates = () => {
     setFormData({
       title: "",
       subject: "",
-      category: "general",
+      category: "proposal",
       body: "",
     });
     setEditingTemplateId(null);
@@ -79,7 +79,7 @@ const UserEmailTemplates = () => {
     setFormData({
       title: template.title || "",
       subject: template.subject || "",
-      category: template.category || "general",
+      category: template.category || "proposal",
       body: template.body || "",
     });
     setEditingTemplateId(template._id);
@@ -211,10 +211,10 @@ const UserEmailTemplates = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500"
               >
-                <option value="general">General</option>
-                <option value="lead">Lead</option>
+                <option value="proposal">Proposal</option>
+                <option value="final">Final Call</option>
                 <option value="followup">Followup</option>
-                <option value="deal">Deal</option>
+                <option value="remainder">Remainder</option>
               </select>
 
               <textarea
@@ -267,10 +267,10 @@ const UserEmailTemplates = () => {
               className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500"
             >
               <option value="all">All Categories</option>
-              <option value="general">General</option>
-              <option value="lead">Lead</option>
+              <option value="proposal">Proposal</option>
+              <option value="final">Final Call</option>
               <option value="followup">Followup</option>
-              <option value="deal">Deal</option>
+              <option value="remainder">Remainder</option>
             </select>
           </div>
         </div>

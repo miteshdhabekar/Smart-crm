@@ -14,8 +14,8 @@ const emailTemplateSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["lead", "followup", "deal", "general"],
-      default: "general",
+      enum: ["final", "followup", "remainder", "proposal"],
+      default: "proposal",
     },
     body: {
       type: String,

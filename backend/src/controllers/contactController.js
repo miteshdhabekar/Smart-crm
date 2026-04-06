@@ -1,4 +1,5 @@
 const Contact = require("../models/Contact");
+const logActivity = require("../utils/logActivity");
 
 const createContact = async (req, res) => {
   try {
