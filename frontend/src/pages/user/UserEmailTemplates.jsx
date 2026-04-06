@@ -212,9 +212,9 @@ const UserEmailTemplates = () => {
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="proposal">Proposal</option>
-                <option value="final">Final Call</option>
-                <option value="followup">Followup</option>
                 <option value="remainder">Remainder</option>
+                <option value="followup">Followup</option>
+                <option value="final">Final Call</option>
               </select>
 
               <textarea

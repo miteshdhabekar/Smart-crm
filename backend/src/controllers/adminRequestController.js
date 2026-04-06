@@ -30,32 +30,37 @@ const approveRequest = async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
+    // 1. Update Database First
     user.approvalStatus = "accepted";
     user.approvalMessage = "Your account request has been approved";
     await user.save();
 
-    await transporter.sendMail({
-      from: process.env.MAIL_USER,
-      to: user.email,
-      subject: "Account Approved",
-      text: `Hello ${user.name}, your account request has been approved. You can now log in to the system.`,
-    });
+    // 2. Respond to Admin immediately (Better UX)
+    res.status(200).json({ message: "Request approved successfully" });
 
-    res.status(200).json({
-      message: "Request approved successfully",
-    });
+    // 3. Handle Side Effects (Email & Logs) in background
+    try {
+      await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: user.email,
+        subject: "Account Approved",
+        text: `Hello ${user.name}, your account request has been approved.`,
+      });
 
-    await logActivity({
-      user: req.session.user,
-      action: "Approved",
-      module: "Request",
-      details: `Approved account request for ${user.email}`,
-    });
+      await logActivity({
+        user: req.session.user,
+        action: "Approved",
+        module: "Request",
+        details: `Approved account request for ${user.email}`,
+      });
+    } catch (sideEffectError) {
+      console.error("Email or Log failed:", sideEffectError);
+      // We don't res.status(500) here because the DB update was already successful
+    }
+
   } catch (error) {
     res.status(500).json({
       message: "Error approving request",
