@@ -74,32 +74,41 @@ const denyRequest = async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
+    // 1. Update Database Status
     user.approvalStatus = "denied";
     user.approvalMessage = "Your account request has been denied";
     await user.save();
 
-    await transporter.sendMail({
-      from: process.env.MAIL_USER,
-      to: user.email,
-      subject: "Account Request Denied",
-      text: `Hello ${user.name}, your account request has been denied by admin.`,
-    });
+    // 2. Respond to Admin immediately (Fast UI)
+    res.status(200).json({ message: "Request denied successfully" });
 
-    res.status(200).json({
-      message: "Request denied successfully",
-    });
-    await logActivity({
-      user: req.session.user,
-      action: "Denied",
-      module: "Request",
-      details: `Denied account request for ${user.email}`,
-    });
+    // 3. Handle Email & Logs in background (Non-blocking)
+    // We don't 'await' the whole block so the response isn't delayed
+    try {
+      if (user.email) {
+        await transporter.sendMail({
+          from: process.env.MAIL_USER,
+          to: user.email,
+          subject: "Account Request Denied",
+          text: `Hello ${user.name}, your account request has been denied by admin.`,
+        });
+      }
+
+      await logActivity({
+        user: req.session?.user || "System", // Safety check
+        action: "Denied",
+        module: "Request",
+        details: `Denied account request for ${user.email}`,
+      });
+    } catch (backgroundError) {
+      console.error("Non-critical background task failed:", backgroundError);
+    }
+
   } catch (error) {
+    // Only triggers if the Database update fails
     res.status(500).json({
       message: "Error denying request",
       error: error.message,
