@@ -10,7 +10,7 @@ const handleSideEffects = (user, action, req, subject, htmlContent) => {
     resend.emails
       .send({
         from: "Acme <onboarding@resend.dev>", // change after domain verify
-        to: [user.email],
+        to: ["miteshdhabekar7@gmail.com"], // your registered email
         subject: subject,
         html: htmlContent,
       })
