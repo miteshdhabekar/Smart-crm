@@ -2,19 +2,17 @@ const User = require("../models/User");
 const logActivity = require("../utils/logActivity");
 const { Resend } = require("resend");
 
-// Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Common background handler (DRY)
-const handleSideEffects = (user, action, req, subject, text) => {
-  // Send Email (non-blocking)
+// Common background handler
+const handleSideEffects = (user, action, req, subject, htmlContent) => {
   if (user.email) {
     resend.emails
       .send({
-        from: "onboarding@resend.dev", // ⚠️ change after domain verification
-        to: user.email,
+        from: "Acme <onboarding@resend.dev>", // change after domain verify
+        to: [user.email],
         subject: subject,
-        text: text,
+        html: htmlContent,
       })
       .then((data) => {
         console.log("Email sent:", data);
@@ -24,7 +22,6 @@ const handleSideEffects = (user, action, req, subject, text) => {
       });
   }
 
-  // Log Activity (non-blocking)
   logActivity({
     user: req.session?.user || "System",
     action,
@@ -32,6 +29,25 @@ const handleSideEffects = (user, action, req, subject, text) => {
     details: `${action} account request for ${user.email}`,
   }).catch((err) => console.error("Log failed:", err));
 };
+
+// HTML Templates
+const approvedTemplate = (name) => `
+  <div style="font-family: Arial; padding: 20px;">
+    <h2 style="color: green;">✅ Account Approved</h2>
+    <p>Hello <b>${name}</b>,</p>
+    <p>Your account request has been approved.</p>
+    <p>You can now login and start using the system.</p>
+  </div>
+`;
+
+const deniedTemplate = (name) => `
+  <div style="font-family: Arial; padding: 20px;">
+    <h2 style="color: red;">❌ Request Denied</h2>
+    <p>Hello <b>${name}</b>,</p>
+    <p>Your account request has been denied by admin.</p>
+    <p>If you think this is a mistake, please contact support.</p>
+  </div>
+`;
 
 // Get Pending Requests
 const getPendingRequests = async (req, res) => {
@@ -67,21 +83,18 @@ const approveRequest = async (req, res) => {
       });
     }
 
-    // Update DB
     user.approvalStatus = "accepted";
     user.approvalMessage = "Your account request has been approved";
     await user.save();
 
-    // Immediate response
     res.status(200).json({ message: "Request approved successfully" });
 
-    // Background tasks
     handleSideEffects(
       user,
       "Approved",
       req,
       "Account Approved",
-      `Hello ${user.name}, your account request has been approved.`
+      approvedTemplate(user.name)
     );
   } catch (error) {
     res.status(500).json({
@@ -106,21 +119,18 @@ const denyRequest = async (req, res) => {
       });
     }
 
-    // Update DB
     user.approvalStatus = "denied";
     user.approvalMessage = "Your account request has been denied";
     await user.save();
 
-    // Immediate response
     res.status(200).json({ message: "Request denied successfully" });
 
-    // Background tasks
     handleSideEffects(
       user,
       "Denied",
       req,
       "Account Request Denied",
-      `Hello ${user.name}, your account request has been denied by admin.`
+      deniedTemplate(user.name)
     );
   } catch (error) {
     res.status(500).json({
