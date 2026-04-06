@@ -1,30 +1,27 @@
 const User = require("../models/User");
-const nodemailer = require("nodemailer");
 const logActivity = require("../utils/logActivity");
+const { Resend } = require("resend");
 
-// Mail Transporter
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
-  },
-});
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Common background handler (DRY)
-const handleSideEffects = (user, action, req, emailSubject, emailText) => {
+const handleSideEffects = (user, action, req, subject, text) => {
   // Send Email (non-blocking)
   if (user.email) {
-    transporter
-      .sendMail({
-        from: process.env.MAIL_USER,
+    resend.emails
+      .send({
+        from: "onboarding@resend.dev", // ⚠️ change after domain verification
         to: user.email,
-        subject: emailSubject,
-        text: emailText,
+        subject: subject,
+        text: text,
       })
-      .catch((err) => console.error("Email failed:", err));
+      .then((data) => {
+        console.log("Email sent:", data);
+      })
+      .catch((err) => {
+        console.error("Email failed:", err);
+      });
   }
 
   // Log Activity (non-blocking)
@@ -64,7 +61,6 @@ const approveRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Prevent duplicate actions
     if (user.approvalStatus !== "pending") {
       return res.status(400).json({
         message: "Request already processed",
@@ -104,7 +100,6 @@ const denyRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Prevent duplicate actions
     if (user.approvalStatus !== "pending") {
       return res.status(400).json({
         message: "Request already processed",
