@@ -2,17 +2,47 @@ const User = require("../models/User");
 const nodemailer = require("nodemailer");
 const logActivity = require("../utils/logActivity");
 
+// Mail Transporter
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },
 });
 
+// Common background handler (DRY)
+const handleSideEffects = (user, action, req, emailSubject, emailText) => {
+  // Send Email (non-blocking)
+  if (user.email) {
+    transporter
+      .sendMail({
+        from: process.env.MAIL_USER,
+        to: user.email,
+        subject: emailSubject,
+        text: emailText,
+      })
+      .catch((err) => console.error("Email failed:", err));
+  }
+
+  // Log Activity (non-blocking)
+  logActivity({
+    user: req.session?.user || "System",
+    action,
+    module: "Request",
+    details: `${action} account request for ${user.email}`,
+  }).catch((err) => console.error("Log failed:", err));
+};
+
+// Get Pending Requests
 const getPendingRequests = async (req, res) => {
   try {
-    const users = await User.find({ approvalStatus: "pending", role: "user" })
+    const users = await User.find({
+      approvalStatus: "pending",
+      role: "user",
+    })
       .select("-password")
       .sort({ createdAt: -1 });
 
@@ -25,6 +55,7 @@ const getPendingRequests = async (req, res) => {
   }
 };
 
+// Approve Request
 const approveRequest = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -33,34 +64,29 @@ const approveRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 1. Update Database First
+    // Prevent duplicate actions
+    if (user.approvalStatus !== "pending") {
+      return res.status(400).json({
+        message: "Request already processed",
+      });
+    }
+
+    // Update DB
     user.approvalStatus = "accepted";
     user.approvalMessage = "Your account request has been approved";
     await user.save();
 
-    // 2. Respond to Admin immediately (Better UX)
+    // Immediate response
     res.status(200).json({ message: "Request approved successfully" });
 
-    // 3. Handle Side Effects (Email & Logs) in background
-    try {
-      await transporter.sendMail({
-        from: process.env.MAIL_USER,
-        to: user.email,
-        subject: "Account Approved",
-        text: `Hello ${user.name}, your account request has been approved.`,
-      });
-
-      await logActivity({
-        user: req.session.user,
-        action: "Approved",
-        module: "Request",
-        details: `Approved account request for ${user.email}`,
-      });
-    } catch (sideEffectError) {
-      console.error("Email or Log failed:", sideEffectError);
-      // We don't res.status(500) here because the DB update was already successful
-    }
-
+    // Background tasks
+    handleSideEffects(
+      user,
+      "Approved",
+      req,
+      "Account Approved",
+      `Hello ${user.name}, your account request has been approved.`
+    );
   } catch (error) {
     res.status(500).json({
       message: "Error approving request",
@@ -69,6 +95,7 @@ const approveRequest = async (req, res) => {
   }
 };
 
+// Deny Request
 const denyRequest = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -77,38 +104,30 @@ const denyRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 1. Update Database Status
+    // Prevent duplicate actions
+    if (user.approvalStatus !== "pending") {
+      return res.status(400).json({
+        message: "Request already processed",
+      });
+    }
+
+    // Update DB
     user.approvalStatus = "denied";
     user.approvalMessage = "Your account request has been denied";
     await user.save();
 
-    // 2. Respond to Admin immediately (Fast UI)
+    // Immediate response
     res.status(200).json({ message: "Request denied successfully" });
 
-    // 3. Handle Email & Logs in background (Non-blocking)
-    // We don't 'await' the whole block so the response isn't delayed
-    try {
-      if (user.email) {
-        await transporter.sendMail({
-          from: process.env.MAIL_USER,
-          to: user.email,
-          subject: "Account Request Denied",
-          text: `Hello ${user.name}, your account request has been denied by admin.`,
-        });
-      }
-
-      await logActivity({
-        user: req.session?.user || "System", // Safety check
-        action: "Denied",
-        module: "Request",
-        details: `Denied account request for ${user.email}`,
-      });
-    } catch (backgroundError) {
-      console.error("Non-critical background task failed:", backgroundError);
-    }
-
+    // Background tasks
+    handleSideEffects(
+      user,
+      "Denied",
+      req,
+      "Account Request Denied",
+      `Hello ${user.name}, your account request has been denied by admin.`
+    );
   } catch (error) {
-    // Only triggers if the Database update fails
     res.status(500).json({
       message: "Error denying request",
       error: error.message,
