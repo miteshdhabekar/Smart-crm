@@ -5,8 +5,8 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // app password
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS, // app password
   },
 });
 
@@ -15,7 +15,7 @@ const handleSideEffects = async (user, action, req, subject, htmlContent) => {
   try {
     if (user.email) {
      const info = await transporter.sendMail({
-      from: `"TEW" <${process.env.EMAIL_USER}>`, // ✅ FIXED
+      from: `"TEW" <${process.env.MAIL_USER}>`, // ✅ FIXED
       to: user.email,
       subject,
       html: htmlContent,
