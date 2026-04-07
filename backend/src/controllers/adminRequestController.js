@@ -96,15 +96,15 @@ const approveRequest = async (req, res) => {
     user.approvalMessage = "Your account request has been approved";
     await user.save();
 
-    res.status(200).json({ message: "Request approved successfully" });
-
-    handleSideEffects(
+    await handleSideEffects(
       user,
       "Approved",
       req,
       "Account Approved",
       approvedTemplate(user.name)
     );
+
+    res.status(200).json({ message: "Request approved successfully" });
   } catch (error) {
     res.status(500).json({
       message: "Error approving request",
@@ -131,16 +131,15 @@ const denyRequest = async (req, res) => {
     // ✅ Delete user instead of updating status
     await User.findByIdAndDelete(req.params.id);
 
-    res.status(200).json({ message: "Request denied and user deleted" });
+      await handleSideEffects(
+        user,
+        "Denied",
+        req,
+        "Account Request Denied",
+        deniedTemplate(user.name)
+      );
 
-    // ✅ Optional: still send email before/after delete
-    handleSideEffects(
-      user,
-      "Denied",
-      req,
-      "Account Request Denied",
-      deniedTemplate(user.name)
-    );
+      res.status(200).json({ message: "Request denied and user deleted" });
 
   } catch (error) {
     res.status(500).json({
