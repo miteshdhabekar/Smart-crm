@@ -128,12 +128,12 @@ const denyRequest = async (req, res) => {
       });
     }
 
-    user.approvalStatus = "denied";
-    user.approvalMessage = "Your account request has been denied";
-    await user.save();
+    // ✅ Delete user instead of updating status
+    await User.findByIdAndDelete(req.params.id);
 
-    res.status(200).json({ message: "Request denied successfully" });
+    res.status(200).json({ message: "Request denied and user deleted" });
 
+    // ✅ Optional: still send email before/after delete
     handleSideEffects(
       user,
       "Denied",
@@ -141,6 +141,7 @@ const denyRequest = async (req, res) => {
       "Account Request Denied",
       deniedTemplate(user.name)
     );
+
   } catch (error) {
     res.status(500).json({
       message: "Error denying request",
