@@ -5,5 +5,9 @@ const api = axios.create({
   withCredentials: true,
 });
 
+axios.get("/api/auth/me", {
+  withCredentials: true,
+});
+
 export default api;
 
