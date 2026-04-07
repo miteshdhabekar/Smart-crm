@@ -14,12 +14,12 @@ const transporter = nodemailer.createTransport({
 const handleSideEffects = async (user, action, req, subject, htmlContent) => {
   try {
     if (user.email) {
-      const info = await transporter.sendMail({
-        from: `"TEW" <${process.env.MAIL_USER}>`,
-        to: user.email,
-        subject,
-        html: htmlContent,
-      });
+     const info = await transporter.sendMail({
+      from: `"TEW" <${process.env.EMAIL_USER}>`, // ✅ FIXED
+      to: user.email,
+      subject,
+      html: htmlContent,
+    });
 
       console.log("✅ Email sent:", info.messageId);
     }
