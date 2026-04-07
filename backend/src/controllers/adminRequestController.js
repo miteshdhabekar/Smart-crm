@@ -1,31 +1,43 @@
 const User = require("../models/User");
 const logActivity = require("../utils/logActivity");
-const nodemailer = require("nodemailer");
+const Mailjet = require("node-mailjet");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS, // app password
-  },
-});
+const mailjet = Mailjet.apiConnect(
+  process.env.MAILJET_API_KEY,
+  process.env.MAILJET_SECRET_KEY
+);
 
 // Common background handler
 const handleSideEffects = async (user, action, req, subject, htmlContent) => {
   try {
     if (user.email) {
-     const info = await transporter.sendMail({
-      from: `"TEW" <${process.env.MAIL_USER}>`, // ✅ FIXED
-      to: user.email,
-      subject,
-      html: htmlContent,
-    });
+      console.log("📧 Sending email to:", user.email);
 
-      console.log("✅ Email sent:", info.messageId);
-      console.log("📧 Sending email to:", user.email)
+      const response = await mailjet
+        .post("send", { version: "v3.1" })
+        .request({
+          Messages: [
+            {
+              From: {
+                Email: process.env.MAILJET_SENDER_EMAIL, // ✅ MUST BE VERIFIED
+                Name: "TEW",
+              },
+              To: [
+                {
+                  Email: user.email,
+                  Name: user.name,
+                },
+              ],
+              Subject: subject,
+              HTMLPart: htmlContent,
+            },
+          ],
+        });
+
+      console.log("✅ Email sent:", response.body);
     }
   } catch (err) {
-    console.error("❌ Email failed:", err);
+    console.error("❌ Email failed:", err.message);
   }
 
   try {
