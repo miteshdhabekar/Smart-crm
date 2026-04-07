@@ -32,6 +32,7 @@ const UserLeads = () => {
   const [editingLeadId, setEditingLeadId] = useState(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [formErrors, setFormErrors] = useState({});
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -314,48 +315,92 @@ const UserLeads = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setMessage("");
+  // validations
+  const validateForm = () => {
+  const errors = {};
 
-    if (formData.source !== "manual" && !formData.sourceDetails.trim()) {
-      setError("Please enter source details");
-      return;
+  if (!formData.title.trim()) {
+    errors.title = "Title is required";
+  }
+
+  if (!formData.name.trim()) {
+  errors.name = "Name is required";
+  } else if (!/^[A-Za-z\s.'-]+$/.test(formData.name)) {
+    errors.name = "Invalid characters in name";
+  } else if (formData.name.trim().length < 3) {
+    errors.name = "Name must be at least 3 characters";
+  } else if (formData.name.length > 50) {
+    errors.name = "Name cannot exceed 50 characters";
+  }
+
+  if (!formData.email.trim()) {
+    errors.email = "Email is required";
+  } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+    errors.email = "Invalid email format";
+  }
+
+  if (!formData.contact.trim()) {
+    errors.contact = "Contact number is required";
+  } else if (!/^[0-9]{7,15}$/.test(formData.contact)) {
+    errors.contact = "Invalid contact number";
+  }
+
+  if (formData.value && Number(formData.value) < 0) {
+    errors.value = "Value cannot be negative";
+  }
+
+  if (formData.source !== "manual" && !formData.sourceDetails.trim()) {
+    errors.sourceDetails = "Source details required";
+  }
+
+  return errors;
+};
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setMessage("");
+
+  const errors = validateForm();
+
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
+    return;
+  }
+
+  try {
+    const payload = {
+      title: formData.title,
+      name: formData.name,
+      company: formData.company,
+      designation: formData.designation,
+      email: formData.email,
+      contact: `${formData.countryCode} ${formData.contact}`.trim(),
+      status: formData.status,
+      source: formData.source,
+      sourceDetails:
+        formData.source === "manual" ? "" : formData.sourceDetails,
+      value: Number(formData.value) || 0,
+    };
+
+    if (editingLeadId) {
+      const res = await updateLead(editingLeadId, payload);
+      setMessage(res.message || "Lead updated successfully");
+    } else {
+      const res = await createLead(payload);
+      setMessage(res.message || "Lead created successfully");
     }
 
-    try {
-      const payload = {
-        title: formData.title,
-        name: formData.name,
-        company: formData.company,
-        designation: formData.designation,
-        email: formData.email,
-        contact: `${formData.countryCode} ${formData.contact}`.trim(),
-        status: formData.status,
-        source: formData.source,
-        sourceDetails:
-          formData.source === "manual" ? "" : formData.sourceDetails,
-        value: Number(formData.value) || 0,
-      };
-
-      if (editingLeadId) {
-        const res = await updateLead(editingLeadId, payload);
-        setMessage(res.message || "Lead updated successfully");
-      } else {
-        const res = await createLead(payload);
-        setMessage(res.message || "Lead created successfully");
-      }
-
-      resetForm();
-      fetchLeads();
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          (editingLeadId ? "Failed to update lead" : "Failed to create lead")
-      );
-    }
-  };
+    setFormErrors({});
+    resetForm();
+    fetchLeads();
+  } catch (err) {
+    setError(
+      err.response?.data?.message ||
+        (editingLeadId ? "Failed to update lead" : "Failed to create lead")
+    );
+  }
+};
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString();
@@ -525,6 +570,9 @@ const UserLeads = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
               />
+              {formErrors.title && (
+  <p className="text-red-500 text-sm">{formErrors.title}</p>
+)}
 
               <input
                 name="name"
@@ -533,6 +581,9 @@ const UserLeads = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
               />
+              {formErrors.name && (
+  <p className="text-red-500 text-sm">{formErrors.name}</p>
+)}
 
               <input
                 name="company"
@@ -557,6 +608,9 @@ const UserLeads = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
               />
+{formErrors.email && (
+  <p className="text-red-500 text-sm">{formErrors.email}</p>
+)}
 
               <div className="flex gap-3">
                 <select
@@ -579,6 +633,9 @@ const UserLeads = () => {
                   onChange={handleChange}
                   className="flex-1 rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
                 />
+{formErrors.contact && (
+  <p className="text-red-500 text-sm">{formErrors.contact}</p>
+)}
               </div>
 
               <select
@@ -630,6 +687,9 @@ const UserLeads = () => {
                   onChange={handleChange}
                   className="w-full rounded-2xl border border-slate-300 py-3 pl-9 pr-4 outline-none focus:ring-2 focus:ring-indigo-500"
                 />
+                {formErrors.value && (
+  <p className="text-red-500 text-sm">{formErrors.value}</p>
+)}
               </div>
 
               <button
