@@ -28,6 +28,7 @@ const UserFollowups = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [formErrors, setFormErrors] = useState({});
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
@@ -205,31 +206,83 @@ const UserFollowups = () => {
     }
   };
 
+  const validateForm = () => {
+  const errors = {};
+
+  if (!formData.title.trim()) {
+    errors.title = "Title is required";
+  }
+
+  if (!formData.contactName.trim()) {
+    errors.contactName = "Contact name is required";
+  } else if (!/^[A-Za-z\s.'-]+$/.test(formData.contactName)) {
+    errors.contactName = "Invalid characters in name";
+  } else if (formData.contactName.length < 3) {
+    errors.contactName = "Must be at least 3 characters";
+  }
+
+  if (!formData.email.trim()) {
+    errors.email = "Email is required";
+  } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+    errors.email = "Invalid email format";
+  }
+
+  if (!formData.phone.trim()) {
+    errors.phone = "Phone number is required";
+  } else if (!/^[0-9]{7,15}$/.test(formData.phone)) {
+    errors.phone = "Invalid phone number";
+  }
+
+  if (!formData.followupDate) {
+    errors.followupDate = "Followup date is required";
+  } else if (new Date(formData.followupDate) < new Date()) {
+    errors.followupDate = "Followup date cannot be in the past";
+  }
+
+  if (formData.relatedTo === "lead" && !formData.leadId) {
+    errors.leadId = "Lead ID is required";
+  }
+
+  if (formData.relatedTo === "deal" && !formData.dealId) {
+    errors.dealId = "Deal ID is required";
+  }
+
+  return errors;
+};
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setError("");
+  e.preventDefault();
+  setMessage("");
+  setError("");
 
-    try {
-      if (editingFollowupId) {
-        const res = await updateFollowup(editingFollowupId, formData);
-        setMessage(res.message || "Followup updated successfully");
-      } else {
-        const res = await createFollowup(formData);
-        setMessage(res.message || "Followup created successfully");
-      }
+  const errors = validateForm();
 
-      resetForm();
-      fetchFollowups();
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          (editingFollowupId
-            ? "Failed to update followup"
-            : "Failed to create followup")
-      );
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
+    return;
+  }
+
+  try {
+    if (editingFollowupId) {
+      const res = await updateFollowup(editingFollowupId, formData);
+      setMessage(res.message || "Followup updated successfully");
+    } else {
+      const res = await createFollowup(formData);
+      setMessage(res.message || "Followup created successfully");
     }
-  };
+
+    setFormErrors({});
+    resetForm();
+    fetchFollowups();
+  } catch (err) {
+    setError(
+      err.response?.data?.message ||
+        (editingFollowupId
+          ? "Failed to update followup"
+          : "Failed to create followup")
+    );
+  }
+};
 
   const formatDateTime = (date) => {
     if (!date) return "-";
@@ -315,6 +368,9 @@ const UserFollowups = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-violet-500"
               />
+              {formErrors.title && (
+  <p className="text-red-500 text-sm">{formErrors.title}</p>
+)}
 
               <select
                 name="relatedTo"
@@ -334,6 +390,9 @@ const UserFollowups = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-violet-500"
               />
+              {formErrors.contactName && (
+  <p className="text-red-500 text-sm">{formErrors.contactName}</p>
+)}
 
               <input
                 name="company"
@@ -350,6 +409,9 @@ const UserFollowups = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-violet-500"
               />
+              {formErrors.email && (
+  <p className="text-red-500 text-sm">{formErrors.email}</p>
+)}
 
               <input
                 name="phone"
@@ -358,6 +420,9 @@ const UserFollowups = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-violet-500"
               />
+              {formErrors.phone && (
+  <p className="text-red-500 text-sm">{formErrors.phone}</p>
+)}
 
               <input
                 name="followupDate"
@@ -366,6 +431,9 @@ const UserFollowups = () => {
                 onChange={handleChange}
                 className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-violet-500"
               />
+              {formErrors.followupDate && (
+  <p className="text-red-500 text-sm">{formErrors.followupDate}</p>
+)}
 
               <select
                 name="status"
