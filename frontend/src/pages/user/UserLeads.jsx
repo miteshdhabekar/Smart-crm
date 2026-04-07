@@ -316,41 +316,62 @@ const UserLeads = () => {
   };
 
   // validations
-  const validateForm = () => {
+const validateForm = () => {
   const errors = {};
 
+  // Title
   if (!formData.title.trim()) {
     errors.title = "Title is required";
+  } else if (formData.title.length < 3) {
+    errors.title = "Title must be at least 3 characters";
+  } else if (formData.title.length > 100) {
+    errors.title = "Title cannot exceed 100 characters";
   }
 
+  // Name
   if (!formData.name.trim()) {
-  errors.name = "Name is required";
-  } else if (!/^[A-Za-z\s.'-]+$/.test(formData.name)) {
-    errors.name = "Invalid characters in name";
-  } else if (formData.name.trim().length < 3) {
-    errors.name = "Name must be at least 3 characters";
-  } else if (formData.name.length > 50) {
-    errors.name = "Name cannot exceed 50 characters";
+    errors.name = "Name is required";
+  } else if (!/^[A-Za-z\s.'-]{3,50}$/.test(formData.name)) {
+    errors.name = "Invalid name (3–50 characters)";
   }
 
+  // Email
   if (!formData.email.trim()) {
     errors.email = "Email is required";
-  } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formData.email)) {
     errors.email = "Invalid email format";
   }
 
+  // Contact
   if (!formData.contact.trim()) {
     errors.contact = "Contact number is required";
-  } else if (!/^[0-9]{7,15}$/.test(formData.contact)) {
-    errors.contact = "Invalid contact number";
+  } else if (!/^\d+$/.test(formData.contact)) {
+    errors.contact = "Only numbers allowed";
+  } else if (formData.contact.length < 7 || formData.contact.length > 15) {
+    errors.contact = "Contact must be 7–15 digits";
   }
 
-  if (formData.value && Number(formData.value) < 0) {
-    errors.value = "Value cannot be negative";
+  // Value
+  if (formData.value) {
+    if (isNaN(formData.value)) {
+      errors.value = "Value must be a number";
+    } else if (Number(formData.value) < 0) {
+      errors.value = "Value cannot be negative";
+    }
   }
 
+  // Source details
   if (formData.source !== "manual" && !formData.sourceDetails.trim()) {
     errors.sourceDetails = "Source details required";
+  }
+
+  // Optional fields
+  if (formData.company && formData.company.length > 100) {
+    errors.company = "Company name too long";
+  }
+
+  if (formData.designation && formData.designation.length > 100) {
+    errors.designation = "Designation too long";
   }
 
   return errors;
