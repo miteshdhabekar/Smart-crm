@@ -22,6 +22,7 @@ const handleSideEffects = async (user, action, req, subject, htmlContent) => {
     });
 
       console.log("✅ Email sent:", info.messageId);
+      console.log("📧 Sending email to:", user.email)
     }
   } catch (err) {
     console.error("❌ Email failed:", err);
