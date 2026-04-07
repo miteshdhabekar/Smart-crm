@@ -1,33 +1,42 @@
 const User = require("../models/User");
 const logActivity = require("../utils/logActivity");
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS, // app password
+  },
+});
 
 // Common background handler
-const handleSideEffects = (user, action, req, subject, htmlContent) => {
-  if (user.email) {
-    resend.emails
-      .send({
-        from: "Acme <onboarding@resend.dev>", // change after domain verify
-        to: ["miteshdhabekar7@gmail.com"], // your registered email
-        subject: subject,
+const handleSideEffects = async (user, action, req, subject, htmlContent) => {
+  try {
+    if (user.email) {
+      const info = await transporter.sendMail({
+        from: `"TEW" <${process.env.MAIL_USER}>`,
+        to: user.email,
+        subject,
         html: htmlContent,
-      })
-      .then((data) => {
-        console.log("Email sent:", data);
-      })
-      .catch((err) => {
-        console.error("Email failed:", err);
       });
+
+      console.log("✅ Email sent:", info.messageId);
+    }
+  } catch (err) {
+    console.error("❌ Email failed:", err);
   }
 
-  logActivity({
-    user: req.session?.user || "System",
-    action,
-    module: "Request",
-    details: `${action} account request for ${user.email}`,
-  }).catch((err) => console.error("Log failed:", err));
+  try {
+    await logActivity({
+      user: req.session?.user || "System",
+      action,
+      module: "Request",
+      details: `${action} account request for ${user.email}`,
+    });
+  } catch (err) {
+    console.error("❌ Log failed:", err);
+  }
 };
 
 // HTML Templates
